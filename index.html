@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>TabAndSub</title>
+    <!-- YouTube Playables SDK -->
+    <script src="https://www.youtube.com/game_api/v1"></script>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #111;
+        font-family: 'Courier New', Courier, monospace;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+      #unity-container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        aspect-ratio: 960 / 600;
+        background: #231F20;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+      }
+      #unity-loading-bar {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ff0000;
+        text-shadow: 2px 2px #000;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+      #unity-progress-bar-empty {
+        width: 200px;
+        height: 16px;
+        background-color: #333;
+        border: 2px solid #fff;
+        padding: 2px;
+        box-shadow: 2px 2px 0px #000;
+      }
+      #unity-progress-bar-full {
+        width: 0%;
+        height: 100%;
+        background-color: #ff0000;
+        transition: width 0.1s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="unity-container">
+      <canvas id="unity-canvas" width="960" height="600"></canvas>
+      <div id="unity-loading-bar">
+        <div class="logo">Loading TapAndSub...</div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/build.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/build.data.unityweb",
+        frameworkUrl: buildUrl + "/build.framework.js.unityweb",
+        codeUrl: buildUrl + "/build.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "DefaultCompany",
+        productName: "TabAndSub",
+        productVersion: "0.1.0",
+      };
+
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+
+      if (/Mobi|Android|iP(hone|od|ad)/.test(navigator.userAgent)) {
+        // Mobile viewport setup
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+      }
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+        }).catch((message) => {
+          console.error("Unity Instance Error:", message);
+        });
+      };
+      document.body.appendChild(script);
+    </script>
+  </body>
+</html>
